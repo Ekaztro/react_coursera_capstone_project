@@ -1,7 +1,36 @@
 import './Navbar.css';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
 
 function Navbar() {
+    const navigate = useNavigate();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userName, setUserName] = useState('');
+
+  useEffect(() => {
+    const token = sessionStorage.getItem('auth-token');
+    const email = sessionStorage.getItem('email');
+
+    if (token) {
+      setIsLoggedIn(true);
+      if (email) {
+        setUserName(email.split('@')[0]);
+      }
+    } else {
+      setIsLoggedIn(false);
+      setUserName('');
+    }
+  }, []);
+
+  const logout = () => {
+    sessionStorage.removeItem('auth-token');
+    sessionStorage.removeItem('email');
+    setIsLoggedIn(false);
+    setUserName('');
+    navigate('/login');
+    window.location.reload();
+  };
+
   function handleClick() {
     console.log("Nav icon clicked");
   }
@@ -49,17 +78,32 @@ function Navbar() {
           <Link to="#">Appointments</Link>
           </li>
           
-          <li className="link">
-          <Link to="/signup">
-              <button className="btn1">Sign Up</button>
-            </Link>
-          </li>
-          
-          <li className="link">
-          <Link to="/login">
-              <button className="btn1">Login</button>
-            </Link>
-          </li>
+          {!isLoggedIn && (
+            <>
+              <li className="link">
+                <Link to="/signup">
+                  <button className="btn1">Sign Up</button>
+                </Link>
+              </li>
+
+              <li className="link">
+                <Link to="/login">
+                  <button className="btn1">Login</button>
+                </Link>
+              </li>
+            </>
+          )}
+
+          {isLoggedIn && (
+            <>
+              <li className="link" style={{ color: '#2190FF', fontWeight: 'bold', alignSelf: 'center' }}>
+                Welcome, {userName}
+              </li>
+              <li className="link">
+                <button className="btn1" onClick={logout}>Logout</button>
+              </li>
+            </>
+          )}
         </ul>
     </nav>
       </div>
