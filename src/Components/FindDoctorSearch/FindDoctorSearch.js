@@ -29,7 +29,7 @@ const FindDoctorSearch = ({ onSearch }) => {
     }
 
     // 🔀 Navigálás új URL-re, de nem töltjük újra az oldalt
-    navigate('/instant-consultation?speciality=${speciality}');
+    navigate(`/booking-consultation?speciality=${speciality}`);
   };
 
   // 👂 Figyeljük, ha a felhasználó a keresőn kívül kattint

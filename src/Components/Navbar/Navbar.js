@@ -75,7 +75,7 @@ function Navbar() {
           </li>
           
           <li className="link">
-          <Link to="#">Appointments</Link>
+          <Link to="/booking-consultation">Appointments</Link>
           </li>
           
           {!isLoggedIn && (

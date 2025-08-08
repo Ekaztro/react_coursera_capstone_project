@@ -3,8 +3,7 @@ import './InstantConsultation.css';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import FindDoctorSearch from './../FindDoctorSearch/FindDoctorSearch';
 import DoctorCard from './../DoctorCard/DoctorCard';
-console.log('FindDoctorSearch type:', typeof FindDoctorSearch);
-console.log('DoctorCard type:', typeof DoctorCard);
+
 
 
 const InstantConsultation = () => {
