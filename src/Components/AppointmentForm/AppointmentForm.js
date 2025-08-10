@@ -15,6 +15,21 @@ const AppointmentForm = ({ doctorName, doctorSpeciality, onSubmit }) => {
   
     const handleFormSubmit = (e) => {
       e.preventDefault();
+       // Összerakjuk a foglalás adatait
+      const appointment = {
+        date: appointmentDate,
+        time: appointmentTime
+      };
+
+      // Elmentjük localStorage-ba a doktor nevével
+      localStorage.setItem(doctorName, JSON.stringify(appointment));
+
+     // Ha szükséges, elmenthetjük a doctor adatokat is
+      localStorage.setItem('doctorData', JSON.stringify({
+        name: doctorName,
+        speciality: doctorSpeciality
+      }));
+
       onSubmit({ name, phoneNumber, appointmentDate, appointmentTime});
       setName('');
       setPhoneNumber('');

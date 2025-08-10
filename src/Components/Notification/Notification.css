@@ -1,0 +1,11 @@
+.notification {
+  position: fixed;
+  bottom: 20px;  /* itt van az alja, nem a teteje */
+  right: 20px;
+  background: #4caf50;
+  color: white;
+  padding: 16px;
+  border-radius: 8px;
+  box-shadow: 0px 4px 10px rgba(0,0,0,0.2);
+  z-index: 9999;
+}
