@@ -15,22 +15,25 @@ const AppointmentForm = ({ doctorName, doctorSpeciality, onSubmit }) => {
   
     const handleFormSubmit = (e) => {
       e.preventDefault();
-       // Összerakjuk a foglalás adatait
+      const storedUsername = sessionStorage.getItem('email'); // ha van, bejelentkezett user
+
       const appointment = {
-        date: appointmentDate,
-        time: appointmentTime
+        doctorName,
+        doctorSpeciality,
+        appointmentDate,
+        appointmentTime
       };
 
-      // Elmentjük localStorage-ba a doktor nevével
-      localStorage.setItem(doctorName, JSON.stringify(appointment));
+      if (storedUsername) {
+        // Bejelentkezett → tartós mentés, Notification látja
+        localStorage.setItem(`appointment_${storedUsername}`, JSON.stringify(appointment));
+        onSubmit({ name, phoneNumber, appointmentDate, appointmentTime});
+      } else {
+        // Nincs bejelentkezés → csak ideiglenesen mentjük
+        sessionStorage.setItem('guestAppointment', JSON.stringify(appointment));
+      }
 
-     // Ha szükséges, elmenthetjük a doctor adatokat is
-      localStorage.setItem('doctorData', JSON.stringify({
-        name: doctorName,
-        speciality: doctorSpeciality
-      }));
-
-      onSubmit({ name, phoneNumber, appointmentDate, appointmentTime});
+      
       setName('');
       setPhoneNumber('');
       setAppointmentDate('');

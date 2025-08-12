@@ -16,20 +16,25 @@ const Notification = ({ children }) => {
   useEffect(() => {
   
     const storedUsername = sessionStorage.getItem('email');
-    const storedDoctorData = JSON.parse(localStorage.getItem('doctorData'));
-    const storedAppointmentData = JSON.parse(localStorage.getItem(storedDoctorData?.name));
-  
-    if (storedUsername) {
-      setIsLoggedIn(true);
-      setUsername(storedUsername);
-    }
-    if (storedDoctorData) {
-      setDoctorData(storedDoctorData);
-    }
-    if (storedAppointmentData) {
-      setAppointmentData(storedAppointmentData);
-    }
- }, []);
+      if (!storedUsername) {
+        // Ha nincs bejelentkezés → ne mutasson Notification-t
+        setShowNotification(false);
+        return;
+      }
+    
+      const storedAppointmentData = JSON.parse(localStorage.getItem(`appointment_${storedUsername}`));
+    
+      if (storedUsername) {
+        setIsLoggedIn(true);
+        setUsername(storedUsername);
+      }
+    
+      if (storedAppointmentData) {
+        setAppointmentData(storedAppointmentData);
+      }else {
+        setShowNotification(false);
+      }
+    }, []);
 
   useEffect(() => {
     if (!appointmentData) {
@@ -51,13 +56,13 @@ const Notification = ({ children }) => {
             <div className="appointment-card__content">
               {/* Display title for appointment details */}
               <h3 className="appointment-card__title">Appointment Details</h3>
-              <p className="appointment-card__message">
+              <div className="appointment-card__message">
                 {/* Display doctor's name from doctorData */}
                 <p><strong>Doctor:</strong> {doctorData?.name}</p>
                 <p><strong>Patient:</strong> {username}</p>
                 <p><strong>Date:</strong> {appointmentData?.date}</p>
                 <p><strong>Time:</strong> {appointmentData?.time}</p>
-              </p>
+              </div>
             </div>
           </div>
         </div>

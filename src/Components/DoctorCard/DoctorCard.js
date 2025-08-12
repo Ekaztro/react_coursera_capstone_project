@@ -10,13 +10,35 @@ const DoctorCard = ({ name, speciality, experience, ratings, profilePic }) => {
   const [showModal, setShowModal] = useState(false);
   const [appointments, setAppointments] = useState([]);
 
+  // Betöltéskor nézzük meg van-e mentett foglalás ehhez a dokihoz
+  useEffect(() => {
+    const storedUsername = sessionStorage.getItem('email');
+    let storedAppointment = null;
+
+    if (storedUsername) {
+        storedAppointment = JSON.parse(localStorage.getItem(`appointment_${storedUsername}`));
+    } else {
+        storedAppointment = JSON.parse(sessionStorage.getItem('guestAppointment'));
+    }
+
+    if (storedAppointment) {
+      setAppointments([storedAppointment]);
+    }
+  }, [name]);
+
   const handleBooking = () => {
     setShowModal(true);
   };
 
   const handleCancel = (appointmentId) => {
-    const updatedAppointments = appointments.filter((appointment) => appointment.id !== appointmentId);
-    setAppointments(updatedAppointments);
+    setAppointments([]);
+
+    const storedUsername = sessionStorage.getItem('email');
+    if (storedUsername) {
+        localStorage.removeItem(`appointment_${storedUsername}`);
+      } else {
+        sessionStorage.removeItem('guestAppointment');
+      }
   };
 
   const handleFormSubmit = (appointmentData) => {
@@ -24,8 +46,15 @@ const DoctorCard = ({ name, speciality, experience, ratings, profilePic }) => {
       id: uuidv4(),
       ...appointmentData,
     };
-    const updatedAppointments = [...appointments, newAppointment];
-    setAppointments(updatedAppointments);
+    setAppointments([newAppointment]);
+
+    const storedUsername = sessionStorage.getItem('email');
+    if (storedUsername) {
+        localStorage.setItem(`appointment_${storedUsername}`, JSON.stringify(newAppointment));
+    } else {
+        sessionStorage.setItem('guestAppointment', JSON.stringify(newAppointment));
+    }
+
     setShowModal(false);
   };
 
@@ -55,7 +84,10 @@ const DoctorCard = ({ name, speciality, experience, ratings, profilePic }) => {
        <Popup
           style={{ backgroundColor: '#FFFFFF' }}
           trigger={
-            <button className={`book-appointment-btn ${appointments.length > 0 ? 'cancel-appointment' : ''}`}>
+            <button
+              className={`book-appointment-btn ${appointments.length > 0 ? 'cancel-appointment' : ''}`}
+              onClick={appointments.length > 0 ? () => handleCancel(appointments[0].id) : handleBooking}
+            >
               {appointments.length > 0 ? (
                 <div>Cancel Appointment</div>
               ) : (

@@ -16,40 +16,41 @@ const BookingConsultation = () => {
         fetch('https://api.npoint.io/9a5543d36f1460da2f63')
         .then(res => res.json())
         .then(data => {
-            if (searchParams.get('speciality')) {
-                // window.reload()
-                const filtered = data.filter(doctor => doctor.speciality.toLowerCase() === searchParams.get('speciality').toLowerCase());
+            setDoctors(data);
 
+            const speciality = searchParams.get('speciality');
+            if (speciality) {
+                // ha van speciality query param, szűrünk
+                const filtered = data.filter(
+                    (doctor) => doctor.speciality.toLowerCase() === speciality.toLowerCase()
+                );
                 setFilteredDoctors(filtered);
-                
                 setIsSearched(true);
-                
             } else {
                 setFilteredDoctors([]);
                 setIsSearched(false);
             }
-            setDoctors(data);
         })
-        .catch(err => console.log(err));
+      .catch(err => console.log(err));
     }
     const handleSearch = (searchText) => {
 
-        if (searchText === '') {
+        if (!searchText) {
             setFilteredDoctors([]);
             setIsSearched(false);
-            } else {
-                
-            const filtered = doctors.filter(
-                (doctor) =>
-                // 
-                doctor.speciality.toLowerCase().includes(searchText.toLowerCase())
-                
-            );
-                
-            setFilteredDoctors(filtered);
-            setIsSearched(true);
-            
+            navigate('/booking-consultation');
+            return;
         }
+                
+        const filtered = doctors.filter(
+            (doctor) =>
+            // 
+            doctor.speciality.toLowerCase().includes(searchText.toLowerCase())
+                
+        );        
+        setFilteredDoctors(filtered);
+        setIsSearched(true);
+        navigate(`/booking-consultation?speciality=${searchText}`);
     };
     const navigate = useNavigate();
     useEffect(() => {
