@@ -20,17 +20,19 @@ const AppointmentForm = ({ doctorName, doctorSpeciality, onSubmit }) => {
       const appointment = {
         doctorName,
         doctorSpeciality,
-        appointmentDate,
-        appointmentTime
+        name,
+        phoneNumber,
+        date: appointmentDate,
+        time: appointmentTime
       };
 
       if (storedUsername) {
         // Bejelentkezett → tartós mentés, Notification látja
-        localStorage.setItem(`appointment_${storedUsername}`, JSON.stringify(appointment));
-        onSubmit({ name, phoneNumber, appointmentDate, appointmentTime});
+        localStorage.setItem(`appointment_${storedUsername}_${doctorName}`,JSON.stringify(appointment));
+        onSubmit(appointment);
       } else {
         // Nincs bejelentkezés → csak ideiglenesen mentjük
-        sessionStorage.setItem('guestAppointment', JSON.stringify(appointment));
+      sessionStorage.setItem(`guestAppointment_${doctorName}`,JSON.stringify(appointment));
       }
 
       

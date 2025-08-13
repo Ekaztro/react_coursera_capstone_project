@@ -6,57 +6,47 @@ import AppointmentForm from './../AppointmentForm/AppointmentForm'
 import { v4 as uuidv4 } from 'uuid';
 
 
-const DoctorCard = ({ name, speciality, experience, ratings, profilePic }) => {
-  const [showModal, setShowModal] = useState(false);
-  const [appointments, setAppointments] = useState([]);
-
-  // Betöltéskor nézzük meg van-e mentett foglalás ehhez a dokihoz
-  useEffect(() => {
-    const storedUsername = sessionStorage.getItem('email');
-    let storedAppointment = null;
-
-    if (storedUsername) {
-        storedAppointment = JSON.parse(localStorage.getItem(`appointment_${storedUsername}`));
-    } else {
-        storedAppointment = JSON.parse(sessionStorage.getItem('guestAppointment'));
-    }
-
-    if (storedAppointment) {
-      setAppointments([storedAppointment]);
-    }
-  }, [name]);
-
-  const handleBooking = () => {
-    setShowModal(true);
-  };
-
-  const handleCancel = (appointmentId) => {
-    setAppointments([]);
-
-    const storedUsername = sessionStorage.getItem('email');
-    if (storedUsername) {
-        localStorage.removeItem(`appointment_${storedUsername}`);
-      } else {
-        sessionStorage.removeItem('guestAppointment');
-      }
-  };
-
-  const handleFormSubmit = (appointmentData) => {
-    const newAppointment = {
-      id: uuidv4(),
-      ...appointmentData,
+const DoctorCard = ({ name, speciality, experience, ratings, profilePic, appointments, setAppointments }) => {
+    const [showModal, setShowModal] = useState(false);
+  
+    // Megnézzük, hogy ehhez a dokihoz van-e foglalás
+    const doctorAppointment = appointments.find(appt => appt.doctorName === name);
+  
+    const handleBooking = () => {
+      setShowModal(true);
     };
-    setAppointments([newAppointment]);
-
-    const storedUsername = sessionStorage.getItem('email');
-    if (storedUsername) {
-        localStorage.setItem(`appointment_${storedUsername}`, JSON.stringify(newAppointment));
-    } else {
-        sessionStorage.setItem('guestAppointment', JSON.stringify(newAppointment));
-    }
-
-    setShowModal(false);
-  };
+  
+    const handleCancel = (appointmentId) => {
+      // Globális appointments state-ből töröljük
+      const updated = appointments.filter(appt => appt.id !== appointmentId);
+      setAppointments(updated);
+  
+      const storedUsername = sessionStorage.getItem('email');
+      if (storedUsername) {
+        localStorage.removeItem(`appointment_${storedUsername}_${name}`);
+      } else {
+        sessionStorage.removeItem(`guestAppointment_${name}`);
+      }
+    };
+  
+    const handleFormSubmit = (appointmentData) => {
+      const newAppointment = {
+        id: uuidv4(),
+        doctorName: name,
+        ...appointmentData,
+      };
+  
+      setAppointments(prev => [...prev, newAppointment]);
+  
+      const storedUsername = sessionStorage.getItem('email');
+      if (storedUsername) {
+        localStorage.setItem(`appointment_${storedUsername}_${name}`, JSON.stringify(newAppointment));
+      } else {
+        sessionStorage.setItem(`guestAppointment_${name}`, JSON.stringify(newAppointment));
+      }
+  
+      setShowModal(false);
+    };
 
   return (
     <div className="doctor-card-container">
@@ -85,16 +75,12 @@ const DoctorCard = ({ name, speciality, experience, ratings, profilePic }) => {
           style={{ backgroundColor: '#FFFFFF' }}
           trigger={
             <button
-              className={`book-appointment-btn ${appointments.length > 0 ? 'cancel-appointment' : ''}`}
-              onClick={appointments.length > 0 ? () => handleCancel(appointments[0].id) : handleBooking}
-            >
-              {appointments.length > 0 ? (
-                <div>Cancel Appointment</div>
-              ) : (
-                <div>Book Appointment</div>
-              )}
-              <div>No Booking Fee</div>
-            </button>
+            className={`book-appointment-btn ${doctorAppointment ? 'cancel-appointment' : ''}`}
+            onClick={doctorAppointment ? () => handleCancel(doctorAppointment.id) : handleBooking}
+          >
+            {doctorAppointment ? <div>Cancel Appointment</div> : <div>Book Appointment</div>}
+            <div>No Booking Fee</div>
+          </button>
           }
           modal
           open={showModal}
@@ -114,16 +100,14 @@ const DoctorCard = ({ name, speciality, experience, ratings, profilePic }) => {
                 </div>
               </div>
 
-              {appointments.length > 0 ? (
+              {doctorAppointment ? (
                 <>
                   <h3 style={{ textAlign: 'center' }}>Appointment Booked!</h3>
-                  {appointments.map((appointment) => (
-                    <div className="bookedInfo" key={appointment.id}>
-                      <p>Name: {appointment.name}</p>
-                      <p>Phone Number: {appointment.phoneNumber}</p>
-                      <button onClick={() => handleCancel(appointment.id)}>Cancel Appointment</button>
-                    </div>
-                  ))}
+                  <div className="bookedInfo" key={doctorAppointment.id}>
+                    <p>Name: {doctorAppointment.name}</p>
+                    <p>Phone Number: {doctorAppointment.phoneNumber}</p>
+                    <button onClick={() => handleCancel(doctorAppointment.id)}>Cancel Appointment</button>
+                  </div>
                 </>
               ) : (
                 <AppointmentForm doctorName={name} doctorSpeciality={speciality} onSubmit={handleFormSubmit} />

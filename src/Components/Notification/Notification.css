@@ -1,6 +1,6 @@
 .notification {
   position: fixed;
-  top: 56px;    /* navbar magassága körül */
+  top: 90px;    /* navbar magassága körül */
   left: 20px;   /* bal oldalt 20px-re */
   background: #4caf50;
   color: white;
