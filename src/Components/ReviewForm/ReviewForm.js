@@ -1,17 +1,17 @@
 // Following code has been commented with appropriate comments for your reference.
 import React, { useState } from 'react';
+import "./ReviewForm.css";
 
 // Function component for giving reviews
-function GiveReviews() {
-  // State variables using useState hook
-  const [showForm, setShowForm] = useState(false);
-  const [submittedMessage, setSubmittedMessage] = useState('');
-  const [showWarning, setShowWarning] = useState(false);
-  const [formData, setFormData] = useState({
-    name: '',
-    review: '',
-    rating: 0
-  });
+function ReviewForm() {
+    const [showForm, setShowForm] = useState(false);
+    const [submittedMessage, setSubmittedMessage] = useState(null);
+    const [showWarning, setShowWarning] = useState(false);
+    const [formData, setFormData] = useState({
+      name: '',
+      review: '',
+      rating: 0
+    });
 
   // Function to handle button click event
   const handleButtonClick = () => {
@@ -27,15 +27,10 @@ function GiveReviews() {
   // Function to handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
-    setSubmittedMessage(formData);
-    setFormData({
-      name: '',
-      review: '',
-      rating: 0
-    });
-    // Check if all required fields are filled before submission
     if (formData.name && formData.review && formData.rating > 0) {
+      setSubmittedMessage(formData);
       setShowWarning(false);
+      setShowForm(false);
     } else {
       setShowWarning(true);
     }
@@ -43,37 +38,53 @@ function GiveReviews() {
 
   return (
     <div>
-      <h2>Form with Message</h2>
-      {!showForm ? (
-        // Display button to open the form
+      <h2>Feedback Form</h2>
+
+      {!showForm && !submittedMessage && (
         <button onClick={handleButtonClick}>Open Form</button>
-      ) : (
-        // Display form for giving feedback
+      )}
+
+      {showForm && !submittedMessage && (
         <form onSubmit={handleSubmit}>
           <h2>Give Your Feedback</h2>
-          {/* Display warning message if not all fields are filled */}
           {showWarning && <p className="warning">Please fill out all fields.</p>}
+
           <div>
             <label htmlFor="name">Name:</label>
             <input type="text" id="name" name="name" value={formData.name} onChange={handleChange} />
           </div>
+
           <div>
             <label htmlFor="review">Review:</label>
             <textarea id="review" name="review" value={formData.review} onChange={handleChange} />
           </div>
-          {/* Submit button for form submission */}
+
+          <div>
+            <label htmlFor="rating">Rating:</label>
+            <select id="rating" name="rating" value={formData.rating} onChange={handleChange}>
+              <option value="0" disabled>-- Select --</option>
+              <option value="1">⭐</option>
+              <option value="2">⭐⭐</option>
+              <option value="3">⭐⭐⭐</option>
+              <option value="4">⭐⭐⭐⭐</option>
+              <option value="5">⭐⭐⭐⭐⭐</option>
+            </select>
+          </div>
+
           <button type="submit">Submit</button>
         </form>
       )}
-      {/* Display the submitted message if available */}
+
       {submittedMessage && (
         <div>
-          <h3>Submitted Message:</h3>
-          <p>{submittedMessage}</p>
+          <h3>Submitted Review:</h3>
+          <p><strong>Name:</strong> {submittedMessage.name}</p>
+          <p><strong>Review:</strong> {submittedMessage.review}</p>
+          <p><strong>Rating:</strong> {"⭐".repeat(submittedMessage.rating)}</p>
         </div>
       )}
     </div>
   );
 }
 
-export default GiveReviews;
+export default ReviewForm;
