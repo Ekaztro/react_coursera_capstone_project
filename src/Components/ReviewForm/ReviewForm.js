@@ -41,32 +41,34 @@ function ReviewForm({ appointments }) {
   return (
     <div>
       <h2>Your Appointments</h2>
-      <table border="1" cellPadding="8">
-        <thead>
-          <tr>
-            <th>Serial Number</th>
-            <th>Doctor Name</th>
-            <th>Doctor Speciality</th>
-            <th>Provide Feedback</th>
-            <th>Review Given</th>
-          </tr>
-        </thead>
-        <tbody>
-          {appointments.map((appt, idx) => (
-            <tr key={idx}>
-              <td>{idx + 1}</td>
-              <td>{appt.doctorName}</td>
-              <td>{appt.speciality}</td>
-              <td>
-                <button onClick={() => handleAddReviewClick(appt)}>
-                  Add Review
-                </button>
-              </td>
-              <td>{hasReview(appt) ? "✅ Yes" : "❌ No"}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <div className="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Serial Number</th>
+                    <th>Doctor Name</th>
+                    <th>Doctor Speciality</th>
+                    <th>Provide Feedback</th>
+                    <th>Review Given</th>
+                </tr>
+            </thead>
+            <tbody>
+                {appointments.map((appt, idx) => (
+                  <tr key={idx}>
+                    <td>{idx + 1}</td>
+                    <td>{appt.doctorName}</td>
+                    <td>{appt.speciality}</td>
+                    <td>
+                        <button onClick={() => handleAddReviewClick(appt)}>
+                          Add Review
+                        </button>
+                    </td>
+                    <td>{hasReview(appt) ? "✅ Yes" : "❌ No"}</td>
+                  </tr>
+                ))}
+            </tbody>
+        </table>
+      </div>
 
       {/* Review form csak ha választott appointment van */}
       {selectedAppointment && (
