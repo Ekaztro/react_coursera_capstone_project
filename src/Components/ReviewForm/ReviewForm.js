@@ -31,11 +31,20 @@ function ReviewForm({ appointments }) {
     }
   };
 
+  const getReviewForAppointment = (appointment) => {
+    return submittedReviews.find(
+      (rev) =>
+        rev.appointment.doctorName === appointment.doctorName &&
+        rev.appointment.doctorSpeciality === appointment.doctorSpeciality
+    );
+  };
+  
+
   const hasReview = (appointment) =>
     submittedReviews.some(
       (rev) =>
         rev.appointment.doctorName === appointment.doctorName &&
-        rev.appointment.speciality === appointment.speciality
+        rev.appointment.doctorSpeciality === appointment.doctorSpeciality
     );
 
   return (
@@ -57,13 +66,29 @@ function ReviewForm({ appointments }) {
                   <tr key={idx}>
                     <td>{idx + 1}</td>
                     <td>{appt.doctorName}</td>
-                    <td>{appt.speciality}</td>
+                    <td>{appt.doctorSpeciality}</td>
                     <td>
-                        <button onClick={() => handleAddReviewClick(appt)}>
-                          Add Review
-                        </button>
+                        {hasReview(appt) ? (
+                          <button className="disabled-btn" disabled>
+                            Already Reviewed
+                          </button>
+                        ) : (
+                          <button onClick={() => handleAddReviewClick(appt)}>
+                            Click Here
+                          </button>
+                        )}
                     </td>
-                    <td>{hasReview(appt) ? "✅ Yes" : "❌ No"}</td>
+                    <td>
+                        {getReviewForAppointment(appt) ? (
+                          <div className="review-card">
+                            <p><strong>Name:</strong> {getReviewForAppointment(appt).name}</p>
+                            <p><strong>Review:</strong> {getReviewForAppointment(appt).review}</p>
+                            <p><strong>Rating:</strong> {"⭐".repeat(getReviewForAppointment(appt).rating)}</p>
+                          </div>
+                        ) : (
+                            "❌ No"
+                        )}
+                    </td>
                   </tr>
                 ))}
             </tbody>
@@ -72,87 +97,66 @@ function ReviewForm({ appointments }) {
 
       {/* Review form csak ha választott appointment van */}
       {selectedAppointment && (
-        <div style={{ marginTop: "20px" }}>
-          <h3>Give Review for {selectedAppointment.doctorName}</h3>
-          <p>
-            <strong>Speciality:</strong> {selectedAppointment.speciality}
-          </p>
+        <div className="modal-overlay">
+            <div className="modal">
+                <h3>Give Review for {selectedAppointment.doctorName}</h3>
+                <form onSubmit={handleSubmit}>
+                    {showWarning && (
+                      <p className="warning">Please fill out all fields.</p>
+                    )}
 
-          <form onSubmit={handleSubmit}>
-            {showWarning && (
-              <p className="warning">Please fill out all fields.</p>
-            )}
+                    <div>
+                      <label htmlFor="name">Your Name:</label>
+                      <input
+                        type="text"
+                        id="name"
+                        name="name"
+                        value={formData.name}
+                        onChange={handleChange}
+                      />
+                    </div>
 
-            <div>
-              <label htmlFor="name">Your Name:</label>
-              <input
-                type="text"
-                id="name"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-              />
+                    <div>
+                      <label htmlFor="review">Review:</label>
+                      <textarea
+                        id="review"
+                        name="review"
+                        value={formData.review}
+                        onChange={handleChange}
+                      />
+                    </div>
+
+                    <div>
+                      <label htmlFor="rating">Rating:</label>
+                      <select
+                        id="rating"
+                        name="rating"
+                        value={formData.rating}
+                        onChange={handleChange}
+                      >
+                        <option value="0" disabled>
+                          -- Select --
+                        </option>
+                        <option value="1">⭐</option>
+                        <option value="2">⭐⭐</option>
+                        <option value="3">⭐⭐⭐</option>
+                        <option value="4">⭐⭐⭐⭐</option>
+                        <option value="5">⭐⭐⭐⭐⭐</option>
+                      </select>
+                    </div>
+
+                    <div className="modal-buttons">
+                      <button type="submit">Submit</button>
+                      <button
+                        type="button"
+                        onClick={() => setSelectedAppointment(null)}
+                        className="cancel-btn"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                </form>
             </div>
-
-            <div>
-              <label htmlFor="review">Review:</label>
-              <textarea
-                id="review"
-                name="review"
-                value={formData.review}
-                onChange={handleChange}
-              />
-            </div>
-
-            <div>
-              <label htmlFor="rating">Rating:</label>
-              <select
-                id="rating"
-                name="rating"
-                value={formData.rating}
-                onChange={handleChange}
-              >
-                <option value="0" disabled>
-                  -- Select --
-                </option>
-                <option value="1">⭐</option>
-                <option value="2">⭐⭐</option>
-                <option value="3">⭐⭐⭐</option>
-                <option value="4">⭐⭐⭐⭐</option>
-                <option value="5">⭐⭐⭐⭐⭐</option>
-              </select>
-            </div>
-
-            <button type="submit">Submit</button>
-            <button type="button" onClick={() => setSelectedAppointment(null)}>
-              Cancel
-            </button>
-          </form>
-        </div>
-      )}
-
-      {/* Beküldött reviewk listázása */}
-      {submittedReviews.length > 0 && (
-        <div style={{ marginTop: "30px" }}>
-          <h2>Submitted Reviews</h2>
-          {submittedReviews.map((rev, idx) => (
-            <div key={idx} className="review-card">
-              <h4>{rev.appointment.doctorName}</h4>
-              <p>
-                <strong>Speciality:</strong> {rev.appointment.speciality}
-              </p>
-              <p>
-                <strong>Name:</strong> {rev.name}
-              </p>
-              <p>
-                <strong>Review:</strong> {rev.review}
-              </p>
-              <p>
-                <strong>Rating:</strong> {"⭐".repeat(rev.rating)}
-              </p>
-              <hr />
-            </div>
-          ))}
         </div>
       )}
     </div>
