@@ -6,6 +6,7 @@ function Navbar() {
     const navigate = useNavigate();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userName, setUserName] = useState('');
+  const [showDropdown, setShowDropdown] = useState(false);
 
   useEffect(() => {
     const token = sessionStorage.getItem('auth-token');
@@ -96,16 +97,29 @@ function Navbar() {
 
           {isLoggedIn && (
             <>
-              <li className="link" style={{ color: '#2190FF', fontWeight: 'bold', alignSelf: 'center' }}>
-                Welcome, {userName}
+              <li
+                className="link welcome-user" style={{ color: '#2190FF', fontWeight: 'bold', position: 'relative' }}
+              >
+                Welcome, {userName} ▼
+                <ul className="dropdown-menu">
+                  <li>
+                    <Link to="/profile">Profile</Link>
+                  </li>
+                  <li>
+                    <Link to="/reports">Your Reports</Link>
+                  </li>
+                </ul>
               </li>
+
               <li className="link">
-                <button className="btn1" onClick={logout}>Logout</button>
+                <button className="btn1" onClick={logout}>
+                    Logout
+                </button>
               </li>
             </>
           )}
         </ul>
-    </nav>
+       </nav>
       </div>
     );
   }
